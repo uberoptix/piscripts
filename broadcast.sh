@@ -21,9 +21,11 @@ DHCP_RANGE_END="${ADDR[0]}.${ADDR[1]}.$((ADDR[2]+1)).$((ADDR[3]+50))"
 echo "$(date) - broadcast.sh - Installing necessary packages…"
 
 sudo apt update
+export DEBIAN_FRONTEND=noninteractive
 sudo apt install hostapd dnsmasq iptables-persistent -y
-systemctl stop hostapd
-systemctl stop dnsmasq
+unset DEBIAN_FRONTEND
+sudo systemctl stop hostapd
+sudo systemctl stop dnsmasq
 
 echo "$(date) - broadcast.sh - Backup up configuration files…"
 
@@ -60,34 +62,34 @@ EOF
 
 echo "$(date) - broadcast.sh - Configuring NetworkManager…"
 
-nmcli dev set $AP_INTERFACE managed no
-ip link set $AP_INTERFACE down
-ip addr add $AP_IP/24 dev $AP_INTERFACE
-ip link set $AP_INTERFACE up
+sudo nmcli dev set $AP_INTERFACE managed no
+sudo ip link set $AP_INTERFACE down
+sudo ip addr add $AP_IP/24 dev $AP_INTERFACE
+sudo ip link set $AP_INTERFACE up
 
 echo "$(date) - broadcast.sh - Configuring iptables…"
 
 for source in "${NET_SOURCES[@]}"; do
-    iptables -t nat -A POSTROUTING -o $source -j MASQUERADE
-    iptables -A FORWARD -i $source -o $AP_INTERFACE -m state --state RELATED,ESTABLISHED -j ACCEPT
-    iptables -A FORWARD -i $AP_INTERFACE -o $source -j ACCEPT
+    sudo iptables -t nat -A POSTROUTING -o $source -j MASQUERADE
+    sudo iptables -A FORWARD -i $source -o $AP_INTERFACE -m state --state RELATED,ESTABLISHED -j ACCEPT
+    sudo iptables -A FORWARD -i $AP_INTERFACE -o $source -j ACCEPT
 done
-netfilter-persistent save
+sudo netfilter-persistent save
 
 echo "$(date) - broadcast.sh - Configuring IP Forwarding…"
 
 echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
-sysctl -p
+sudo sysctl -p
 
 echo "$(date) - broadcast.sh - Restarting services…"
 
-systemctl unmask hostapd
-systemctl enable hostapd
-systemctl start hostapd
-systemctl unmask dnsmasq
-systemctl enable dnsmasq
-systemctl start dnsmasq
-systemctl restart NetworkManager
+sudo systemctl unmask hostapd
+sudo systemctl enable hostapd
+sudo systemctl start hostapd
+sudo systemctl unmask dnsmasq
+sudo systemctl enable dnsmasq
+sudo systemctl start dnsmasq
+sudo systemctl restart NetworkManager
 
 echo "$(date) - broadcast.sh - Wi-Fi Access Point setup is complete. Reboot now? (y/n)"
 
