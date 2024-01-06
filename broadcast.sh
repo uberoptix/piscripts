@@ -4,6 +4,18 @@
 # Designed to quickly setup a wifi broadcast on a new install of Raspberry Pi OS.
 # Last updated 6 Jan 2024
 
+# Define script URL
+script_url="https://raw.githubusercontent.com/uberoptix/piscripts/main/broadcast.sh"
+
+# Check if the script is running in a pipe (e.g., via curl command)
+if [ ! -t 0 ]; then
+    # Download and run the script locally
+    curl -sSL "$script_url" -o /tmp/uberoptix_broadcast.sh
+    bash /tmp/uberoptix_broadcast.sh
+    rm /tmp/uberoptix_broadcast.sh
+    exit $?
+fi
+
 while true; do
     # Prompt for user input
     read -p "Enter the Wi-Fi interface name (e.g., wlan1): " wifi_interface
