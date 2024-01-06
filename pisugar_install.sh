@@ -1,4 +1,10 @@
 #!/bin/bash
+
+# pisugar_install.sh by James Forwood (uberoptix)
+# Designed to install the PiSugar2 Plus per https://github.com/PiSugar/PiSugar/wiki/PiSugar2-Plus
+# Note that this WILL fail at version selection; ctrl-C out and run 'sudo apt upgrade' to continue
+# Last updated 6 Jan 2024
+
 set -e
 
 # version
