@@ -21,9 +21,14 @@ DHCP_RANGE_END="${ADDR[0]}.${ADDR[1]}.$((ADDR[2]+1)).$((ADDR[3]+50))"
 echo "$(date) - broadcast.sh - Installing necessary packages…"
 
 sudo apt update
+temp_dir=$(mktemp -d)
+echo "iptables-persistent iptables-persistent/autosave_v4 boolean true" > "$temp_dir/iptables-persistent.seed"
+echo "iptables-persistent iptables-persistent/autosave_v6 boolean true" >> "$temp_dir/iptables-persistent.seed"
+sudo debconf-set-selections "$temp_dir/iptables-persistent.seed"
 export DEBIAN_FRONTEND=noninteractive
 sudo apt install hostapd dnsmasq iptables-persistent -y
 unset DEBIAN_FRONTEND
+rm -r "$temp_dir"
 sudo systemctl stop hostapd
 sudo systemctl stop dnsmasq
 
