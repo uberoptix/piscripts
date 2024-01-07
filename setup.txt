@@ -14,25 +14,33 @@ sudo systemctl stop hostapd
 sudo systemctl stop dnsmasq
 sudo mv /etc/dnsmasq.conf /etc/dnsmasq.conf.bak
 sudo cp /etc/sysctl.conf /etc/sysctl.conf.bak
-sudo nano /etc/hostapd/hostapd.conf
-  interface=$AP_INTERFACE
-  driver=nl80211
-  ssid=$AP_SSID
-  hw_mode=g
-  channel=7
-  wmm_enabled=0
-  macaddr_acl=0
-  auth_algs=1
-  ignore_broadcast_ssid=0
-  wpa=2
-  wpa_passphrase=$AP_PASSPHRASE
-  wpa_key_mgmt=WPA-PSK
-  wpa_pairwise=TKIP
-  rsn_pairwise=CCMP
+
+sudo touch /etc/hostapd/hostapd.conf
+sudo tee /etc/hostapd/hostapd.conf > /dev/null <<EOL
+interface=$AP_INTERFACE
+driver=nl80211
+ssid=$AP_SSID
+hw_mode=g
+channel=7
+wmm_enabled=0
+macaddr_acl=0
+auth_algs=1
+ignore_broadcast_ssid=0
+wpa=2
+wpa_passphrase=$AP_PASSPHRASE
+wpa_key_mgmt=WPA-PSK
+wpa_pairwise=TKIP
+rsn_pairwise=CCMP
+EOL
+
 sudo sed -i 's/^#DAEMON_CONF=""/DAEMON_CONF="\/etc\/hostapd\/hostapd.conf"/' /etc/default/hostapd
-sudo nano /etc/dnsmasq.conf
-  interface=wlan1
-  dhcp-range=192.168.5.10,192.168.5.50,255.255.255.0,24h
+
+sudo touch /etc/dnsmasq.conf
+sudo tee /etc/dnsmasq.conf > /dev/null <<EOL
+interface=wlan1
+dhcp-range=192.168.5.10,192.168.5.50,255.255.255.0,24h
+EOL
+
 sudo nmcli dev set wlan1 managed no
 sudo ip link set wlan1 down
 sudo ip addr add 192.168.5.1/24 dev wlan1
