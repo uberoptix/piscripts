@@ -33,14 +33,13 @@ wpa_pairwise=TKIP
 rsn_pairwise=CCMP
 EOL
 
-sudo sed -i 's/^#DAEMON_CONF=""/DAEMON_CONF="\/etc\/hostapd\/hostapd.conf"/' /etc/default/hostapd
-
 sudo touch /etc/dnsmasq.conf
 sudo tee /etc/dnsmasq.conf > /dev/null <<EOL
 interface=wlan1
 dhcp-range=192.168.5.10,192.168.5.50,255.255.255.0,24h
 EOL
 
+sudo sed -i 's/^#DAEMON_CONF=""/DAEMON_CONF="\/etc\/hostapd\/hostapd.conf"/' /etc/default/hostapd
 sudo nmcli dev set wlan1 managed no
 sudo ip link set wlan1 down
 sudo ip addr add 192.168.5.1/24 dev wlan1
