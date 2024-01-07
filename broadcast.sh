@@ -21,16 +21,9 @@ DHCP_RANGE_END="${ADDR[0]}.${ADDR[1]}.$((ADDR[2]+1)).$((ADDR[3]+50))"
 echo "$(date) - broadcast.sh - Installing necessary packages…"
 
 sudo apt update
-temp_dir=$(mktemp -d)
-echo "iptables-persistent iptables-persistent/autosave_v4 boolean true" > "$temp_dir/iptables-persistent.seed"
-echo "iptables-persistent iptables-persistent/autosave_v6 boolean true" >> "$temp_dir/iptables-persistent.seed"
-sudo debconf-set-selections "$temp_dir/iptables-persistent.seed"
-export DEBIAN_FRONTEND=noninteractive
-sudo apt install hostapd dnsmasq iptables-persistent -y
-unset DEBIAN_FRONTEND
-rm -r "$temp_dir"
-sudo systemctl stop hostapd
-sudo systemctl stop dnsmasq
+sudo apt install hostapd dnsmasq -y
+systemctl stop hostapd
+systemctl stop dnsmasq
 
 echo "$(date) - broadcast.sh - Backup up configuration files…"
 
@@ -79,7 +72,7 @@ for source in "${NET_SOURCES[@]}"; do
     sudo iptables -A FORWARD -i $source -o $AP_INTERFACE -m state --state RELATED,ESTABLISHED -j ACCEPT
     sudo iptables -A FORWARD -i $AP_INTERFACE -o $source -j ACCEPT
 done
-sudo netfilter-persistent save
+#sudo netfilter-persistent save
 
 echo "$(date) - broadcast.sh - Configuring IP Forwarding…"
 
@@ -96,18 +89,20 @@ sudo systemctl enable dnsmasq
 sudo systemctl start dnsmasq
 sudo systemctl restart NetworkManager
 
-echo "$(date) - broadcast.sh - Wi-Fi Access Point setup is complete. Reboot now? (y/n)"
+sudo apt install iptables-persistent -y
 
-read -r REBOOT_CONFIRMATION
-if [[ $REBOOT_CONFIRMATION =~ ^[Yy]$ ]]; then
-    echo "Rebooting in 10 seconds to apply changes. Press any key to cancel."
-    read -t 10 -n 1
-    if [ $? = 0 ]; then
-        echo "$(date) - broadcast.sh - Reboot cancelled by user."
-    else
-        echo "$(date) - broadcast.sh - Rebooting now."
-        sudo reboot
-    fi
-else
-    echo "$(date) - broadcast.sh - You may need to manually reboot your system for changes to take effect."
-fi
+#echo "$(date) - broadcast.sh - Wi-Fi Access Point setup is complete. Reboot now? (y/n)"
+#
+#read -r REBOOT_CONFIRMATION
+#if [[ $REBOOT_CONFIRMATION =~ ^[Yy]$ ]]; then
+#    echo "Rebooting in 10 seconds to apply changes. Press any key to cancel."
+#    read -t 10 -n 1
+#    if [ $? = 0 ]; then
+#        echo "$(date) - broadcast.sh - Reboot cancelled by user."
+#    else
+#        echo "$(date) - broadcast.sh - Rebooting now."
+#        sudo reboot
+#    fi
+#else
+#    echo "$(date) - broadcast.sh - You may need to manually reboot your system for changes to take effect."
+#fi
