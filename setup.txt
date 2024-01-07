@@ -7,7 +7,16 @@
       Locale: US & UTF-8
       Wireless Lan Country: US
 3. Terminal > curl -fsSL https://tailscale.com/install.sh | sh
-4. SSH >
+4. Firefox > Settings > Cookies and Site Data > Delete cookies and site data when Firefox is closed
+             More Tools > Customize Toolbar > Title Bar: Off
+5. Desktop Preferences >
+   Defaults > For small screens: Set Defaults
+   Desktop > Wastebasket: Off
+   Desktop > Mounted Disks: Off
+   Menu Bar > Size: Small (16x16)
+   Menu Bar > Position: Bottom
+   System > Theme: Dark
+6. SSH >
 sudo apt update && sudo apt full-upgrade -y
 sudo apt install hostapd dnsmasq -y
 sudo systemctl stop hostapd
@@ -56,3 +65,14 @@ sudo apt install iptables-persistent -y
 sudo systemctl unmask hostapd && sudo systemctl enable hostapd && sudo systemctl start hostapd
 sudo systemctl unmask dnsmasq && sudo systemctl enable dnsmasq && sudo systemctl start dnsmasq
 sudo systemctl restart NetworkManager
+
+curl http://cdn.pisugar.com/release/pisugar-power-manager.sh | sudo bash
+ctrl-c
+ctrl-c
+sudo apt upgrade
+
+sudo rm -rf LCD-show
+git clone https://github.com/goodtft/LCD-show.git
+chmod -R 755 LCD-show
+cd LCD-show
+sudo ./LCD35-show
